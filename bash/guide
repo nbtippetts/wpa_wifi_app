@@ -1,0 +1,10 @@
+use the following command to download the installation file:
+
+# wget https:/install_arc.sh
+
+sudo chmod u+x install_arc.sh
+sudo ./install_arc.sh
+
+sudo raspi-config
+
+enable camera

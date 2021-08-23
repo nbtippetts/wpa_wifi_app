@@ -1,0 +1,1 @@
+{"APtime": 180, "LocalAPSSID": "ARC_WIFI", "LocalIPaddress": "192.168.1.172", "LocalPORT": "1914", "name": "IPsetting"}
