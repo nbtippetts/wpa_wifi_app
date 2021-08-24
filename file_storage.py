@@ -2,8 +2,8 @@
 """
 file storage utility
 """
-from __future__ import print_function
-from builtins import range
+
+
 import basic_setting
 import logging
 import os

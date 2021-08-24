@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# ENV VARS
+IP="192.168.1.172"
+PORT="9818"
+WiFiAPname="ARC_WIFI"
+WiFiAPpsw="arc_secret"
+MQTTsupport="y"
+ChangeHostName="y"
+NewHostName="the-arc"
+doreboot="y"
 
 #Debug enable next 3 lines
 exec 5> install.txt
@@ -155,9 +164,10 @@ echo "ARC-set HW clock ****************************************"
 echo ds3231 0x68 > /sys/class/i2c-adapter/i2c-1/new_device || true
 hwclock -s || true
 
-echo "ARC-start system ****************************************"
-cd /home/pi/env/autonom/
-sudo python3 /home/pi/env/autonom/bentornado.py &
+echo "ARC-start-web system ****************************************"
+cd /var/www/html/wpa_wifi_app/
+export FLASK_APP=start
+flask run
 
 #END ARC SECTION
 
@@ -198,53 +208,50 @@ function valid_ip()
     return $stat
 }
 
+# input_UI ()
+# {
 
-input_UI ()
-{
+# echo "Hello, following initial setting is requested:"
 
-echo "Hello, following initial setting is requested:"
+# # IP part input
+# while ! valid_ip $IP; do
+# 	read -p "Local IP address (range 192.168.1.100-192.168.1.200), to confirm press [ENTER] or modify: " -e -i 192.168.1.172 IP
+# 	if valid_ip $IP; then stat='good';
+# 	else stat='bad'; echo "WRONG FORMAT, please enter a valid value for IP address"
+# 	fi
 
-# IP part input
+# done
+# 	echo "Confirmed IP address: "$IP
 
-IP="0"
-while ! valid_ip $IP; do
-	read -p "Local IP address (range 192.168.1.100-192.168.1.200), to confirm press [ENTER] or modify: " -e -i 192.168.1.172 IP
-	if valid_ip $IP; then stat='good';
-	else stat='bad'; echo "WRONG FORMAT, please enter a valid value for IP address"
-	fi
+# PORT=""
+# while [[ ! $PORT =~ ^[0-9]+$ ]]; do
+# read -p "Local PORT, to confirm press [ENTER] or modify: " -e -i 9818 PORT
+# 	if [[ ! $PORT =~ ^[0-9]+$ ]];
+# 	then echo "WRONG FORMAT, please enter a valid value for PORT";
+# 	fi
+# done
+# 	echo "Confirmed PORT: "$PORT
 
-done
-	echo "Confirmed IP address: "$IP
+# # Local WiFi AP name and password setting
 
-PORT=""
-while [[ ! $PORT =~ ^[0-9]+$ ]]; do
-read -p "Local PORT, to confirm press [ENTER] or modify: " -e -i 9818 PORT
-	if [[ ! $PORT =~ ^[0-9]+$ ]];
-	then echo "WRONG FORMAT, please enter a valid value for PORT";
-	fi
-done
-	echo "Confirmed PORT: "$PORT
+# read -p "System WiFi AP name, to confirm press [ENTER] or modify: " -e -i ARC_WIFI WiFiAPname
+# echo "Confirmed Name: "$WiFiAPname
 
-# Local WiFi AP name and password setting
+# read -p "System WiFi AP password, to confirm press [ENTER] or modify: " -e -i arc_secret WiFiAPpsw
+# echo "Confirmed Password: "$WiFiAPpsw
 
-read -p "System WiFi AP name, to confirm press [ENTER] or modify: " -e -i ARC_WIFI WiFiAPname
-echo "Confirmed Name: "$WiFiAPname
+# read -p "Do you want to change hostname? (y,n): " -e -i y ChangeHostName
+# echo "Confirmed Answer: "$ChangeHostName
 
-read -p "System WiFi AP password, to confirm press [ENTER] or modify: " -e -i arc_secret WiFiAPpsw
-echo "Confirmed Password: "$WiFiAPpsw
+# if [ "$ChangeHostName" == "y" ]; then
+# 	read -p "System Hostname, to confirm press [ENTER] or modify: " -e -i arc-9818 NewHostName
+# 	echo "Confirmed Hostname: "$NewHostName
+# fi
 
-read -p "Do you want to change hostname? (y,n): " -e -i y ChangeHostName
-echo "Confirmed Answer: "$ChangeHostName
+# read -p "Do you want to install MQTT support? (y,n): " -e -i y MQTTsupport
+# echo "Confirmed Answer: "$MQTTsupport
 
-if [ "$ChangeHostName" == "y" ]; then
-	read -p "System Hostname, to confirm press [ENTER] or modify: " -e -i arc-9818 NewHostName
-	echo "Confirmed Hostname: "$NewHostName
-fi
-
-read -p "Do you want to install MQTT support? (y,n): " -e -i y MQTTsupport
-echo "Confirmed Answer: "$MQTTsupport
-
-}
+# }
 
 
 install_MQTTsupport ()
@@ -281,8 +288,8 @@ ask_reboot ()
 {
 
 
-read -p "Do you want to reboot the system? (y,n): " -e -i y doreboot
-echo "Confirmed Answer: "$doreboot
+# read -p "Do you want to reboot the system? (y,n): " -e -i y doreboot
+# echo "Confirmed Answer: "$doreboot
 
 if [ "$doreboot" == "y" ]; then
 	sudo reboot
@@ -550,9 +557,7 @@ sudo iptables-save > /home/pi/iptables.rules
 
 # --- RUN the functions
 killpython
-input_UI
 system_update_light
-#system_update_UI
 install_dependencies
 enable_I2C
 modify_RClocal
@@ -561,15 +566,11 @@ fn_dnsmasq
 fn_dhcpcd
 fn_ifnames
 install_mjpegstr
-#install_squid3
 install_nginx
-install_hydrosys4 # this should be called before the DHT22 , SPI and BMP due to local library references
-install_DHT22lib
 install_SPIlib
 install_MQTTsupport
 edit_defaultnetworkdb
-#edit_networkdb
 iptables_blockports
 apply_newhostname
 echo "installation is finished!!! "
-ask_reboot
+# ask_reboot

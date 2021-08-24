@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function
-from builtins import str
-from builtins import range
+#!/usr/bin/python3
 Release="0.1b"
 #---------------------
 from logger_config import LOG_SETTINGS
@@ -299,11 +296,6 @@ if __name__ == '__main__':
 
 	# start web server--------------- -------------------------
 	print("start web server")
-	global PUBLICPORT
-	if PUBLICMODE:
-		app.run(debug=DEBUGMODE,use_reloader=False,host= '0.0.0.0',port=networkmod.LOCALPORT)
-		#app.run(host='0.0.0.0', debug=True, port=12345, use_reloader=True)
-	else:
-		app.run(debug=DEBUGMODE,use_reloader=False,port=80)
+	app.run(debug=DEBUGMODE,use_reloader=False,port=80)
 
 	print("close")
