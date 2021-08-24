@@ -11,9 +11,9 @@ import sys
 import string
 from datetime import datetime,date,timedelta
 import time
-import filestoragemod
+import file_storage
 
-logger = logging.getLogger("hydrosys4."+__name__)
+logger = logging.getLogger("arc."+__name__)
 
 # ///////////////// -- GLOBAL VARIABLES AND INIZIALIZATION --- //////////////////////////////////////////
 
@@ -32,10 +32,10 @@ MESSAGEFILENAME="database/networkmessage.txt"
 # read data -----
 data=[]
 #read data from BASICDATAFILENAME file
-done=filestoragemod.readfiledata_spec(BASICDATAFILENAME,"# HERE->",data)
+done=file_storage.readfiledata_spec(BASICDATAFILENAME,"# HERE->",data)
 if done:
 	print("writing default network data")
-	filestoragemod.savefiledata(DATAFILENAME,data)
+	file_storage.savefiledata(DATAFILENAME,data)
 	logger.info('Basic network data acquired')
 else:
 	print("ERROR ----------------------------- not able to get network data")
@@ -48,7 +48,7 @@ else:
 
 def getstoredmessage():
 	filedata=[]
-	isok=filestoragemod.readfiledata_plaintext(MESSAGEFILENAME,filedata)
+	isok=file_storage.readfiledata_plaintext(MESSAGEFILENAME,filedata)
 	outstring=""
 	for line in filedata:
 		outstring=outstring+line+'\n'
@@ -58,7 +58,7 @@ def getstoredmessage():
 def storemessage(message):
 	messagelist=[]
 	messagelist.append(message)
-	filestoragemod.savefiledata_plaintext(MESSAGEFILENAME,messagelist)
+	file_storage.savefiledata_plaintext(MESSAGEFILENAME,messagelist)
 
 
 # END part relevant to Message file
@@ -66,10 +66,10 @@ def storemessage(message):
 
 
 def savedata(filedata):
-	filestoragemod.savefiledata(DATAFILENAME,filedata)
+	file_storage.savefiledata(DATAFILENAME,filedata)
 
 def readdata(filedata):
-	filestoragemod.readfiledata(DATAFILENAME,filedata)
+	file_storage.readfiledata(DATAFILENAME,filedata)
 
 
 
@@ -77,35 +77,35 @@ def getIPaddress():
 	recordkey="name"
 	recordvalue="IPsetting"
 	keytosearch="LocalIPaddress"
-	dataitem=filestoragemod.searchdata(DATAFILENAME,recordkey,recordvalue,keytosearch)
+	dataitem=file_storage.searchdata(DATAFILENAME,recordkey,recordvalue,keytosearch)
 	return dataitem
 
 def getPORT():
 	recordkey="name"
 	recordvalue="IPsetting"
 	keytosearch="LocalPORT"
-	dataitem=filestoragemod.searchdata(DATAFILENAME,recordkey,recordvalue,keytosearch)
+	dataitem=file_storage.searchdata(DATAFILENAME,recordkey,recordvalue,keytosearch)
 	return dataitem
 
 def getAPSSID():
 	recordkey="name"
 	recordvalue="IPsetting"
 	keytosearch="LocalAPSSID"
-	dataitem=filestoragemod.searchdata(DATAFILENAME,recordkey,recordvalue,keytosearch)
+	dataitem=file_storage.searchdata(DATAFILENAME,recordkey,recordvalue,keytosearch)
 	return dataitem
 
 def getWAITTOCONNECT():
 	recordkey="name"
 	recordvalue="IPsetting"
 	keytosearch="APtime"
-	dataitem=filestoragemod.searchdata(DATAFILENAME,recordkey,recordvalue,keytosearch)
+	dataitem=file_storage.searchdata(DATAFILENAME,recordkey,recordvalue,keytosearch)
 	return dataitem
 
 def getWIFIENDIS():
 	recordkey="name"
 	recordvalue="IPsetting"
 	keytosearch="WIFIENDIS"
-	dataitem=filestoragemod.searchdata(DATAFILENAME,recordkey,recordvalue,keytosearch)
+	dataitem=file_storage.searchdata(DATAFILENAME,recordkey,recordvalue,keytosearch)
 	return dataitem
 
 
@@ -113,14 +113,14 @@ def getCUSTOMURL():
 	recordkey="name"
 	recordvalue="IPsetting"
 	keytosearch="customURL"
-	dataitem=filestoragemod.searchdata(DATAFILENAME,recordkey,recordvalue,keytosearch)
+	dataitem=file_storage.searchdata(DATAFILENAME,recordkey,recordvalue,keytosearch)
 	return dataitem
 
 
 def changesavesetting(FTparameter,FTvalue):
 	searchfield="name"
 	searchvalue="IPsetting"
-	isok=filestoragemod.savechange(DATAFILENAME,searchfield,searchvalue,FTparameter,FTvalue)
+	isok=file_storage.savechange(DATAFILENAME,searchfield,searchvalue,FTparameter,FTvalue)
 	if not isok:
 		print("problem saving parameters")
 	return isok
@@ -129,9 +129,9 @@ def changesavesetting(FTparameter,FTvalue):
 
 
 def restoredefault():
-	filestoragemod.deletefile(DATAFILENAME)
-	filedata=[{"name": "IPsetting", "LocalIPaddress": "192.168.1.172", "LocalPORT": "5172", "LocalAPSSID" : "ARC", "APtime" : "180"}]
-	filestoragemod.savefiledata(DATAFILENAME,filedata)
+	file_storage.deletefile(DATAFILENAME)
+	filedata=[{"name": "IPsetting", "LocalIPaddress": "192.168.1.172", "LocalPORT": "9818", "LocalAPSSID" : "ARC_WIFI", "APtime" : "180"}]
+	file_storage.savefiledata(DATAFILENAME,filedata)
 
 
 

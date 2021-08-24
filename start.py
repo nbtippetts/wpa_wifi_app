@@ -4,25 +4,25 @@ from builtins import str
 from builtins import range
 Release="0.1b"
 #---------------------
-from loggerconfig import LOG_SETTINGS
+from logger_config import LOG_SETTINGS
 import logging, logging.config, logging.handlers
-import basicSetting
+import basic_setting
 
-DEBUGMODE=basicSetting.data["DEBUGMODE"]
-PUBLICMODE=basicSetting.data["PUBLICMODE"]
+DEBUGMODE=basic_setting.data["DEBUGMODE"]
+PUBLICMODE=basic_setting.data["PUBLICMODE"]
 
 if DEBUGMODE:
 	# below line is required for the loggin of the apscheduler, this might not be needed in the puthon 3.x
 	logging.basicConfig(level=logging.DEBUG,
 						format='%(asctime)s %(levelname)s %(message)s',
-						filename='logfiles/apscheduler_hydrosystem.log',
+						filename='logfiles/arc.log',
 						filemode='w')
 
 
 # dedicated logging for the standard operation
 
 logging.config.dictConfig(LOG_SETTINGS)
-logger = logging.getLogger('hydrosys4')
+logger = logging.getLogger('arc')
 exc_logger = logging.getLogger('exception')
 
 
@@ -40,16 +40,15 @@ import sys
 import string
 import random
 import json
-import selectedplanmod
 import networkmod
-import networkdbmod
-import sysconfigfilemod
+import network_db
+import sysconfig_file
 
 
 # ///////////////// -- GLOBAL VARIABLES AND INIZIALIZATION --- //////////////////////////////////////////
-application = Flask(__name__)
-application.config.from_object('flasksettings') #read the configuration variables from a separate module (.py) file, this file is mandatory for Flask operations
-print("-----------------" , basicSetting.data["INTRO"], "--------------------")
+app = Flask(__name__)
+app.config.from_object('flask_settings') #read the configuration variables from a separate module (.py) file, this file is mandatory for Flask operations
+print("-----------------" , basic_setting.data["INTRO"], "--------------------")
 
 
 MYPATH=""
@@ -84,7 +83,11 @@ try:
 except:
 	print("No WiFi available")
 
-@application.route('/network/', methods=['GET', 'POST'])
+@app.route('/')
+def home():
+	return "<h1>Hello</h1>"
+
+@app.route('/network/', methods=['GET', 'POST'])
 def network():
 	wifilist=[]
 	savedssid=[]
@@ -107,17 +110,14 @@ def network():
 
 
 	localwifisystem=networkmod.localwifisystem
-	#print " localwifisystem = ", localwifisystem , " connectedssid ", connectedssid
-	message=networkmod.networkdbmod.getstoredmessage()
+	message=networkmod.network_db.getstoredmessage()
 
 	return render_template('network.html',filenamelist=filenamelist, connectedssid=connectedssid,localwifisystem=localwifisystem, ipext=ipext, iplocallist=iplocallist , iplocal=iplocal, iplocalwifi=iplocalwifi , ipport=ipport , hostname=hostname, message=message)
 
 
 
-@application.route('/wificonfig/', methods=['GET', 'POST'])
-def wificonfig():
-	if not session.get('logged_in'):
-		return render_template('login.html',error=None, change=False)
+@app.route('/wifi_config/', methods=['GET', 'POST'])
+def wifi_config():
 	print("method " , request.method)
 	if request.method == 'GET':
 		ssid = request.args.get('ssid')
@@ -127,11 +127,9 @@ def wificonfig():
 		ssid = request.form['ssid']
 		if request.form['buttonsub'] == "Save":
 			password=request.form['password']
-			#networkmod.savewifi(ssid, password)
 			networkmod.waitandsavewifiandconnect(7,ssid,password)
-			#redirect to login
-			session.pop('logged_in', None)
-			return redirect(url_for('login', message="Please wait until the WiFi disconnect and reconnect"))
+			#redirect to network
+			return redirect(url_for('network', message="Please wait until the WiFi disconnect and reconnect"))
 
 		elif request.form['buttonsub'] == "Forget":
 			print("forget")
@@ -139,21 +137,17 @@ def wificonfig():
 			print("remove network ", ssid)
 			print("Try to connect AP")
 			networkmod.waitandconnect_AP(9)
-			session.pop('logged_in', None)
-			return redirect(url_for('login', message="Please wait until the WiFi disconnect and reconnect"))
+			return redirect(url_for('network', message="Please wait until the WiFi disconnect and reconnect"))
 
 		else:
 			print("cancel")
 			return redirect(url_for('network'))
 
-	return render_template('wificonfig.html', ssid=ssid)
+	return render_template('wifi_config.html', ssid=ssid)
 
 
-@application.route('/echowifi/', methods=['GET'])
-def echowifi():
-	if not session.get('logged_in'):
-		ret_data = {"answer":"Login needed"}
-		return jsonify(ret_data)
+@app.route('/echo_wifi/', methods=['GET'])
+def echo_wifi():
 	ret_data={}
 	element=request.args['element']
 	if element=="all":
@@ -182,10 +176,8 @@ def echowifi():
 	#print "Wifi Data " , ret_data
 	return jsonify(ret_data)
 
-@application.route('/networksetting/', methods=['GET', 'POST'])
-def networksetting():
-	if not session.get('logged_in'):
-		return render_template('login.html',error=None, change=False)
+@app.route('/network_setting/', methods=['GET', 'POST'])
+def network_setting():
 	error = None
 
 	Fake_password="AP-password"
@@ -229,26 +221,26 @@ def networksetting():
 
 
 				print("save in network file in database")
-				networkdbmod.changesavesetting('LocalIPaddress',IPADDRESS)
-				networkdbmod.changesavesetting('LocalAPSSID',AP_SSID)
-				networkdbmod.changesavesetting('APtime',AP_TIME)
-				networkdbmod.changesavesetting('WIFIENDIS',WIFIENDIS)
+				network_db.changesavesetting('LocalIPaddress',IPADDRESS)
+				network_db.changesavesetting('LocalAPSSID',AP_SSID)
+				network_db.changesavesetting('APtime',AP_TIME)
+				network_db.changesavesetting('WIFIENDIS',WIFIENDIS)
 
 				# save and change values in the HOSTAPD config file
-				sysconfigfilemod.hostapdsavechangerow("ssid",AP_SSID)
+				sysconfig_file.hostapdsavechangerow("ssid",AP_SSID)
 				if AP_PASSWORD!=Fake_password:
 					# change password in the HOSTAPD config file
-					sysconfigfilemod.hostapdsavechangerow("wpa_passphrase",AP_PASSWORD)
+					sysconfig_file.hostapdsavechangerow("wpa_passphrase",AP_PASSWORD)
 					print("password changed")
 				else:
 					AP_PASSWORD=""
 
 				if IPADDRESSold!=IPADDRESS:
 					# save changes in DHCPCD confign file
-					sysconfigfilemod.modifydhcpcdconfigfile(IPADDRESSold, IPADDRESS)
+					sysconfig_file.modifydhcpcdconfigfile(IPADDRESSold, IPADDRESS)
 
 					# save changes in DNSMASQ confign file
-					sysconfigfilemod.modifydnsmasqconfigfile(IPADDRESSold, IPADDRESS)
+					sysconfig_file.modifydnsmasqconfigfile(IPADDRESSold, IPADDRESS)
 
 				if HOSTNAME!=HOSTNAMEold:
 					networkmod.setnewhostname(HOSTNAME)
@@ -261,8 +253,8 @@ def networksetting():
 
 				# Change hostapd file first row with HERE
 				data=[]
-				networkdbmod.readdata(data)
-				sysconfigfilemod.hostapdsavechangerow_spec(data)
+				network_db.readdata(data)
+				sysconfig_file.hostapdsavechangerow_spec(data)
 
 				if WIFIENDISold!=WIFIENDIS:
 					if WIFIENDIS=="Disabled":
@@ -299,7 +291,7 @@ def networksetting():
 
 
 
-	return render_template('networksetting.html', IPADDRESS=IPADDRESS, AP_SSID=AP_SSID, AP_PASSWORD=AP_PASSWORD, AP_TIME=AP_TIME , HOSTNAME=HOSTNAME, WIFIENDIS=WIFIENDIS)
+	return render_template('network_setting.html', IPADDRESS=IPADDRESS, AP_SSID=AP_SSID, AP_PASSWORD=AP_PASSWORD, AP_TIME=AP_TIME , HOSTNAME=HOSTNAME, WIFIENDIS=WIFIENDIS)
 
 
 if __name__ == '__main__':
@@ -309,9 +301,9 @@ if __name__ == '__main__':
 	print("start web server")
 	global PUBLICPORT
 	if PUBLICMODE:
-		application.run(debug=DEBUGMODE,use_reloader=False,host= '0.0.0.0',port=networkmod.LOCALPORT)
-		#application.run(host='0.0.0.0', debug=True, port=12345, use_reloader=True)
+		app.run(debug=DEBUGMODE,use_reloader=False,host= '0.0.0.0',port=networkmod.LOCALPORT)
+		#app.run(host='0.0.0.0', debug=True, port=12345, use_reloader=True)
 	else:
-		application.run(debug=DEBUGMODE,use_reloader=False,port=80)
+		app.run(debug=DEBUGMODE,use_reloader=False,port=80)
 
 	print("close")

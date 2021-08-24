@@ -1,5 +1,8 @@
 file_/*
+file:/*
 env/*
 __pycache__
 logfiles/hydrosystem.log
 logfiles/apscheduler_hydrosystem.log
+.vscode/*
+*.pyc

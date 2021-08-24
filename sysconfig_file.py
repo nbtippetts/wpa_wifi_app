@@ -8,7 +8,7 @@ from builtins import range
 import logging
 import os
 import os.path
-import filestoragemod
+import file_storage
 
 
 
@@ -21,8 +21,8 @@ import filestoragemod
 def modifydhcpcdconfigfile(oldIP, newIP):
 
 	# change the relevant section in the dhcpcd file
-	afterkeyword="START HYDROSYS4 SECTION"
-	beforekeyword="END HYDROSYS4 SECTION"
+	afterkeyword="START ARC SECTION"
+	beforekeyword="END ARC SECTION"
 	#conffilepath="/home/anona/env/prova/dhcpcd.conf" #fake path
 	conffilepath="/etc/dhcpcd.conf" #real path
 	keyword="static ip_address"
@@ -39,8 +39,8 @@ def modifydnsmasqconfigfile(oldIP, newIP):
 		return False
 
 	# implement
-	afterkeyword="START HYDROSYS4 SECTION"
-	beforekeyword="END HYDROSYS4 SECTION"
+	afterkeyword="START ARC SECTION"
+	beforekeyword="END ARC SECTION"
 	#conffilepath="/home/anona/env/prova/dnsmasq.conf" #fake path
 	conffilepath="/etc/dnsmasq.conf" #real path
 	keyword="dhcp-range"
@@ -77,7 +77,7 @@ def calculaterange(IPaddress):
 def modifyfilestring(filename, oldstring, newstring, afterkeyword, beforekeyword, keyword, separator):
 
 	filedata=[]
-	filestoragemod.readfiledata_plaintext(filename,filedata)
+	file_storage.readfiledata_plaintext(filename,filedata)
 	#print "text File /n" , filedata
 	can_modify=False
 	for i in range(len(filedata)):
@@ -95,7 +95,7 @@ def modifyfilestring(filename, oldstring, newstring, afterkeyword, beforekeyword
 				filedata[i]=line.replace(oldstring,newstring)
 
 				print(" new row  ------------ !!!!!!!!! " , filedata[i])
-				filestoragemod.savefiledata_plaintext(filename,filedata)
+				file_storage.savefiledata_plaintext(filename,filedata)
 				return True
 			else:
 				print("String value not found ", oldstring)
@@ -106,14 +106,14 @@ def modifyfilestring(filename, oldstring, newstring, afterkeyword, beforekeyword
 def hostapdsavechangerow(searchkey,newvalue):
 	BASICDATAFILENAME="/etc/hostapd/hostapd.conf"
 	newrow=searchkey+"="+newvalue
-	filestoragemod.savechangerow_plaintext(BASICDATAFILENAME,searchkey,newrow)
+	file_storage.savechangerow_plaintext(BASICDATAFILENAME,searchkey,newrow)
 
 def hostapdsavechangerow_spec(data):
 	BASICDATAFILENAME="/etc/hostapd/hostapd.conf"
 	identifier="# HERE->"
-	datastring=filestoragemod.disct2text(data[0])
+	datastring=file_storage.disct2text(data[0])
 	newrow=identifier+datastring
-	filestoragemod.savechangerow_plaintext(BASICDATAFILENAME,identifier,newrow)
+	file_storage.savechangerow_plaintext(BASICDATAFILENAME,identifier,newrow)
 
 
 

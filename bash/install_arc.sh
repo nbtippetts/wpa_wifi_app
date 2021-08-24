@@ -208,7 +208,7 @@ echo "Hello, following initial setting is requested:"
 
 IP="0"
 while ! valid_ip $IP; do
-	read -p "Local IP address (range 192.168.0.100-192.168.1.200), to confirm press [ENTER] or modify: " -e -i 192.168.1.172 IP
+	read -p "Local IP address (range 192.168.1.100-192.168.1.200), to confirm press [ENTER] or modify: " -e -i 192.168.1.172 IP
 	if valid_ip $IP; then stat='good';
 	else stat='bad'; echo "WRONG FORMAT, please enter a valid value for IP address"
 	fi
@@ -218,7 +218,7 @@ done
 
 PORT=""
 while [[ ! $PORT =~ ^[0-9]+$ ]]; do
-read -p "Local PORT, to confirm press [ENTER] or modify: " -e -i 1914 PORT
+read -p "Local PORT, to confirm press [ENTER] or modify: " -e -i 9818 PORT
 	if [[ ! $PORT =~ ^[0-9]+$ ]];
 	then echo "WRONG FORMAT, please enter a valid value for PORT";
 	fi
@@ -237,7 +237,7 @@ read -p "Do you want to change hostname? (y,n): " -e -i y ChangeHostName
 echo "Confirmed Answer: "$ChangeHostName
 
 if [ "$ChangeHostName" == "y" ]; then
-	read -p "System Hostname, to confirm press [ENTER] or modify: " -e -i ARC-1914 NewHostName
+	read -p "System Hostname, to confirm press [ENTER] or modify: " -e -i arc-9818 NewHostName
 	echo "Confirmed Hostname: "$NewHostName
 fi
 
@@ -455,7 +455,49 @@ echo "$(cat $aconf)$APPEND" > $aconf
 
 }
 
+install_nginx ()
+{
+# this function is used
+cd /home/pi
 
+sudo apt-get -y install nginx
+
+# create default file
+aconf="/etc/nginx/sites-enabled/default"
+if [ -f $aconf ]; then
+   cp $aconf /home/pi/$aconf.1
+   sudo rm $aconf
+   echo "remove file"
+fi
+
+
+sudo bash -c "cat >> $aconf" << EOF
+server {
+    # for a public HTTP server:
+    listen $PORT;
+    server_name localhost;
+    access_log off;
+    error_log off;
+    location / {
+        proxy_pass http://127.0.0.1:5000;
+    }
+    location /stream {
+        rewrite ^/stream/(.*) /$1 break;
+        proxy_pass http://127.0.0.1:5000;
+        proxy_buffering off;
+    }
+    location /favicon.ico {
+        alias /home/pi/env/autonom/static/favicon.ico;
+    }
+}
+EOF
+
+sudo service nginx start
+
+cd ..
+cd ..
+
+}
 edit_defaultnetworkdb ()
 {
 
@@ -467,7 +509,7 @@ if [ -f $aconf ]; then
    echo "network default file already exist"
    else
    sudo bash -c "cat >> $aconf" << EOF
-{"name": "IPsetting", "LocalIPaddress": "192.168.0.172", "LocalPORT": "5012" , "LocalAPSSID" : "ARC"}
+{"name": "IPsetting", "LocalIPaddress": "192.168.0.172", "LocalPORT": "9818" , "LocalAPSSID" : "ARC_WIFI"}
 EOF
 
 fi

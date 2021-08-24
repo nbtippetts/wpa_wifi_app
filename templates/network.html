@@ -1,10 +1,6 @@
 {% extends "layout.html" %}
 {% set active_page = "network" %}
 {% block body %}
-  {% if session.logged_in %}
-  
-  
-  
   <div class="container-fluid">
 
 		
@@ -95,7 +91,7 @@
   
   
 		
-		<form novalidate="true" action="{{ url_for('networksetting') }}" id="networksetting" method="post" >
+		<form novalidate="true" action="{{ url_for('network_setting') }}" id="network_setting" method="post" >
             <div class="page-header">
 			<div class="row">
 				<div class="col-xs-4">
@@ -134,7 +130,7 @@
 				//alert("starting");
 				$.ajax({
 							type: "GET",
-							url: $SCRIPT_ROOT + "/echowifi/?element=" + "all" ,
+							url: $SCRIPT_ROOT + "/echo_wifi/?element=" + "all" ,
 							contentType: "application/json; charset=utf-8",
 							data: { echoValue: "requestfordata" },
 							success: function(s) {
@@ -149,7 +145,7 @@
 										} else {
 											var htmltext1a='<span class="glyphicon glyphicon-remove-sign" style="color:red"></span>';
 										}
-										var urlcontent='{{ url_for("wificonfig")}}'+'?ssid='+key;
+										var urlcontent='{{ url_for("wifi_config")}}'+'?ssid='+key;
 										var htmltext2='<a href="'+urlcontent+'">'+key+'</a>';
 														
 										var htmltext3='</div><div class="col-xs-4"><div> '+data[key][0]+' </div></div></div>';
@@ -202,15 +198,6 @@
 
 					}, 100);
 			</script>
-  
-	
-  
-  
-  {% else %}
-
-		<h1>Please log in</h1>
-		
-  {% endif %}
   <ul class=entries>
 
   </ul>

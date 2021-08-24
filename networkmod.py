@@ -5,7 +5,7 @@ from builtins import str
 import logging
 import subprocess
 import threading
-import networkdbmod
+import network_db
 # import selectedplanmod
 # stuff for the IP detection
 import shlex
@@ -14,28 +14,28 @@ import urllib.request, urllib.error, urllib.parse
 import socket
 import time
 import wpa_cli_mod
-import messageboxmod
+import message_box
 
-logger = logging.getLogger("ARC_WIFI."+__name__)
+logger = logging.getLogger("arc."+__name__)
 
-localwifisystem=networkdbmod.getAPSSID()
+localwifisystem=network_db.getAPSSID()
 if localwifisystem=="":
 	localwifisystem="ARC_WIFI"
 	print("error the name of AP not found, double check the hostapd configuration")
 	logger.error("error the name of AP not found, double check the hostapd configuration")
 LOCALPORT=5020
-PUBLICPORT=networkdbmod.getPORT()
-WAITTOCONNECT=networkdbmod.getWAITTOCONNECT()
-WIFIENDIS=networkdbmod.getWIFIENDIS()
+PUBLICPORT=network_db.getPORT()
+WAITTOCONNECT=network_db.getWAITTOCONNECT()
+WIFIENDIS=network_db.getWIFIENDIS()
 if WAITTOCONNECT=="":
 	WAITTOCONNECT=180 # should be 180 at least
-	networkdbmod.changesavesetting('APtime',WAITTOCONNECT) # if field not present it will be added
-IPADDRESS =networkdbmod.getIPaddress()
+	network_db.changesavesetting('APtime',WAITTOCONNECT) # if field not present it will be added
+IPADDRESS =network_db.getIPaddress()
 EXTERNALIPADDR=""
 DHCP_COUNTER=0
 
 def getCUSTOMURL():
-	return networkdbmod.getCUSTOMURL()
+	return network_db.getCUSTOMURL()
 
 def stopNTP():
 	#sudo systemctl disable systemd-timesyncd.service
@@ -421,7 +421,7 @@ def waituntilIFUP(interface,timeout): # not working properly, to be re-evaluated
 
 def flushIP(interface): #-------------------
 	print("try flush IP")
-	cmd = ['ip', 'addr' , 'flush' , 'dev', interface]
+	cmd = ['sudo', 'ip', 'addr' , 'flush' , 'dev', interface]
 	try:
 		# sudo ip addr flush dev wlan0
 
@@ -506,15 +506,15 @@ def checkGWsubnet(interface): #-------------------
 			logger.warning("Warning: not same subnet gw ip = %s , static ip = %s", ipaddr , IPADDRESS)
 			logger.warning("STATIC ip address will not be set")
 			message="Warning: Last wifi connection, subnet not matching gateway ip = "+ ipaddr +" static ip =" + IPADDRESS +". Change the static IP address to match the Wifi GW subnet e.g " + newstaticIP
-			networkdbmod.storemessage(message)
+			network_db.storemessage(message)
 			dictitem={'title': "System Message (Alert)", 'content': message }
-			messageboxmod.SaveMessage(dictitem)
+			message_box.SaveMessage(dictitem)
 			return False , ipaddr
 		else:
 			logger.info("ok: same subnet")
 			print("ok: same subnet")
 			message=""
-			networkdbmod.storemessage(message)
+			network_db.storemessage(message)
 
 
 	else:
@@ -522,7 +522,7 @@ def checkGWsubnet(interface): #-------------------
 		logger.info("No default Gateway for wlan0")
 		message=""
 		ipaddr=""
-		networkdbmod.storemessage(message)
+		network_db.storemessage(message)
 
 	return True, ipaddr
 
@@ -541,10 +541,10 @@ def addIP(interface, brd=True): #-------------------
 			BROADCASTIPvect=IPADDRESS.split(".")
 			BROADCASTIPvect[3]="255"
 			BROADCASTIP=".".join(BROADCASTIPvect)
-			cmd = ['ip', 'addr' , 'add' , IPADDRESS+'/24' , 'broadcast' , BROADCASTIP , 'dev', interface]
+			cmd = ['sudo','ip', 'addr' , 'add' , IPADDRESS+'/24' , 'broadcast' , BROADCASTIP , 'dev', interface]
 		else:
 			# ip addr add 192.168.0.172/24 dev wlan0
-			cmd = ['ip', 'addr' , 'add' , IPADDRESS+'/24' , 'dev', interface]
+			cmd = ['sudo','ip', 'addr' , 'add' , IPADDRESS+'/24' , 'dev', interface]
 		ifup_output = subprocess.check_output(cmd).decode('utf-8')
 		print("ADD IP address: ", interface , " OK ", ifup_output)
 		time.sleep(0.5)

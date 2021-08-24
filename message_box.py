@@ -1,7 +1,7 @@
 import sqlite3
 import os
 from datetime import datetime
-import basicSetting  # for the database path
+import basic_setting  # for the database path
 
 
 # database class -----------
@@ -11,8 +11,8 @@ import basicSetting  # for the database path
 class _DataBase:
 
 	def __init__(self,databasetable):
-		databasepath=basicSetting.data["DATABASEPATH"]
-		databaseschemapath=basicSetting.data["SCHEMAFILEPATH"]
+		databasepath=basic_setting.data["DATABASEPATH"]
+		databaseschemapath=basic_setting.data["SCHEMAFILEPATH"]
 		dbfilename="msgdb.db"
 		descfilename="msgschema.sql"
 		self.dbpathfile=os.path.join(databasepath, dbfilename)

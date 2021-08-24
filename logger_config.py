@@ -21,7 +21,7 @@ LOG_SETTINGS = {
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'level': 'DEBUG',
             'formatter': 'simple',
-            'filename': 'logfiles/hydrosystem.log',
+            'filename': 'logfiles/arc.log',
             'backupCount': 3,
             'encoding': 'utf8',
             'when': 'midnight',
@@ -32,7 +32,7 @@ LOG_SETTINGS = {
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'level': 'ERROR',
             'formatter': 'detailed',
-            'filename': 'logfiles/ex_hydrosystem.log',
+            'filename': 'logfiles/ex_arc.log',
             'backupCount': 3,
             'encoding': 'utf8',
             'when': 'midnight',
@@ -41,7 +41,7 @@ LOG_SETTINGS = {
         }
     },
     'loggers': {
-        'hydrosys4': {
+        'arc': {
             'handlers':['access_file_handler'],
             'propagate': False,
             'level':'DEBUG'

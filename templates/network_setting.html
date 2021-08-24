@@ -1,11 +1,10 @@
 {% extends "layout.html" %}
 {% block body %}
-  {% if session.logged_in %}
 
 	 <div class="container-fluid">
 
 
-      <form class="form-horizontal" action="{{ url_for('networksetting') }}" method=post>
+      <form class="form-horizontal" action="{{ url_for('network_setting') }}" method=post>
 
 
 				
@@ -134,8 +133,6 @@
       </form>
       </div>	
  <!-- end form --> 
-  
-  {% endif %}
   <ul class=entries>
 
   </ul>

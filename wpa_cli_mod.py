@@ -6,7 +6,7 @@ import time
 import subprocess
 import re
 
-logger = logging.getLogger("hydrosys4."+__name__)
+logger = logging.getLogger("arc."+__name__)
 
 def db2dbm(quality):
 	"""

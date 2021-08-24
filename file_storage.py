@@ -4,7 +4,7 @@ file storage utility
 """
 from __future__ import print_function
 from builtins import range
-import basicSetting
+import basic_setting
 import logging
 import os
 import os.path
@@ -16,7 +16,7 @@ import json
 # ///////////////// -- GLOBAL VARIABLES AND INIZIALIZATION --- //////////////////////////////////////////
 
 global DATABASEPATH
-DATABASEPATH=basicSetting.data["DATABASEPATH"]
+DATABASEPATH=basic_setting.data["DATABASEPATH"]
 
 # ///////////////// --- END GLOBAL VARIABLES ------
 
@@ -99,7 +99,7 @@ def savefiledata_plaintext(pathfilename,filedata):
 		out_file.write("\n")
 	out_file.close()
 
-def readfiledata_spec(pathfilename,identifier,filedata): # used also in networkdbmod
+def readfiledata_spec(pathfilename,identifier,filedata): # used also in network_db
 	if os.path.isfile(pathfilename): #file is there
 		# read the selected table file
 		in_file = open(pathfilename,"r")
