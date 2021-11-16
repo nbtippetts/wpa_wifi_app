@@ -64,12 +64,12 @@ function install_dependencies()
 sudo apt-get -y install python3-dev || { echo "ERROR --------------------------Installation failed ----------------" && exit ;}
 sudo apt -y install python3-pip || { echo "ERROR --------------------------Installation failed ----------------" && exit ;}
 sudo pip3 install flask || { echo "ERROR --------------------------Installation failed ----------------" && exit ;}
-sudo pip3 install apscheduler || { echo "ERROR --------------------------Installation failed ----------------" && exit ;}
+# sudo pip3 install apscheduler || { echo "ERROR --------------------------Installation failed ----------------" && exit ;}
 sudo pip3 install pyserial || { echo "ERROR --------------------------Installation failed ----------------" && exit ;}
 sudo apt-get install python3-future
 
 #(for the webcam support)
-sudo apt-get -y install fswebcam || { echo "ERROR --------------------------Installation failed ----------------" && exit ;}
+# sudo apt-get -y install fswebcam || { echo "ERROR --------------------------Installation failed ----------------" && exit ;}
 
 #(for the image thumbnail support)
 sudo apt-get -y install libjpeg-dev || { echo "ERROR --------------------------Installation failed ----------------" && exit ;}
@@ -86,7 +86,7 @@ sudo pip3 install pbkdf2 || { echo "ERROR --------------------------Installation
 sudo pip3 install tornado || { echo "ERROR --------------------------Installation failed ----------------" && exit ;}
 
 #(GPIO)
-sudo pip3 install RPi.GPIO
+# sudo pip3 install RPi.GPIO
 }
 
 function enable_I2C()
