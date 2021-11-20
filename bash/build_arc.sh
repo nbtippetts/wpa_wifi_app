@@ -12,8 +12,8 @@ fi
 git clone https://github.com/nbtippetts/ARC.git
 cd ARC/
 sudo docker-compose up --build -d
-git clone https://github.com/nbtippetts/wpa_wifi_app.git /var/www/html/
-sudo chmod u+x /var/www/html/wpa_wifi_app/bash/install_arc.sh
-cd /var/www/html/wpa_wifi_app/bash/
-./install_arc.sh
-sudo reboot
+#git clone https://github.com/nbtippetts/wpa_wifi_app.git /var/www/html/
+#sudo chmod u+x /var/www/html/wpa_wifi_app/bash/install_arc.sh
+#cd /var/www/html/wpa_wifi_app/bash/
+#./install_arc.sh
+#sudo reboot
